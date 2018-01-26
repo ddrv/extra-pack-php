@@ -29,7 +29,7 @@ $data = array(
 );
 $format = 'A6key1/Ckey2/t4key3';
 $binary = \Ddrv\Extra\Pack::pack($format, $data);
-$result = \Ddrv\Extra\Pack::pack($format, $binary);
+$result = \Ddrv\Extra\Pack::unpack($format, $binary);
 print_r($result);
 ```
 
