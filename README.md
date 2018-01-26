@@ -1,7 +1,7 @@
-[![Packagist](https://img.shields.io/packagist/v/ddrv/extrapack.svg?style=flat-square)](https://packagist.org/packages/ddrv/extrapack)
-[![Downloads](https://img.shields.io/packagist/dt/ddrv/extrapack.svg?style=flat-square)](https://packagist.org/packages/ddrv/extrapack/stats)
-[![License](https://img.shields.io/packagist/l/ddrv/extrapack.svg?style=flat-square)](https://github.com/ddrv/extrapack/blob/master/LICENSE)
-[![PHP](https://img.shields.io/packagist/php-v/ddrv/extrapack.svg?style=flat-square)](https://php.net)
+[![Packagist](https://img.shields.io/packagist/v/ddrv/extra-pack.svg?style=flat-square)](https://packagist.org/packages/ddrv/extra-pack)
+[![Downloads](https://img.shields.io/packagist/dt/ddrv/extra-pack.svg?style=flat-square)](https://packagist.org/packages/ddrv/extra-pack/stats)
+[![License](https://img.shields.io/packagist/l/ddrv/extra-pack.svg?style=flat-square)](https://github.com/ddrv/extra-pack/blob/master/LICENSE)
+[![PHP](https://img.shields.io/packagist/php-v/ddrv/extra-pack.svg?style=flat-square)](https://php.net)
 
 # ExtraPack
 
