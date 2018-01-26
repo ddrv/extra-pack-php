@@ -36,9 +36,9 @@ print_r($result);
 ```text
 Array
 (
-    [key4] => string
-    [key5] => 5
-    [key6] => .0001
+    [key1] => string
+    [key2] => 5
+    [key3] => .0001
 )
 ```
 
