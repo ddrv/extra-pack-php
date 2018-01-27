@@ -618,6 +618,9 @@ class PackTest extends TestCase
      */
     public function testBigQWithoutKey()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('incorrect format (Q)');
+        }
         $format = 'Q';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -629,6 +632,9 @@ class PackTest extends TestCase
      */
     public function testBigQWithNumber()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character Q (Q4c-Q)');
+        }
         $format = 'Q4c-Q';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -640,6 +646,9 @@ class PackTest extends TestCase
      */
     public function testSmallQWithoutKey()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('incorrect format (q)');
+        }
         $format = 'q';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -651,6 +660,9 @@ class PackTest extends TestCase
      */
     public function testSmallQWithNumber()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character q (q4c-q)');
+        }
         $format = 'q4c-q';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -662,6 +674,9 @@ class PackTest extends TestCase
      */
     public function testBigJWithoutKey()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('incorrect format (J)');
+        }
         $format = 'J';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -673,6 +688,9 @@ class PackTest extends TestCase
      */
     public function testBigJWithNumber()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character J (J4c-J)');
+        }
         $format = 'J4c-J';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -684,6 +702,9 @@ class PackTest extends TestCase
      */
     public function testBigPWithoutKey()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('incorrect format (P)');
+        }
         $format = 'P';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -695,6 +716,9 @@ class PackTest extends TestCase
      */
     public function testBigPWithNumber()
     {
+        if (version_compare($this->phpVersion, '5.6.3', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character P (P4c-P)');
+        }
         $format = 'P4c-P';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -728,6 +752,9 @@ class PackTest extends TestCase
      */
     public function testBigGWithoutKey()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('incorrect format (G)');
+        }
         $format = 'G';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -739,6 +766,9 @@ class PackTest extends TestCase
      */
     public function testBigGWithNumber()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character G (G4c-G)');
+        }
         $format = 'G4c-G';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -750,6 +780,9 @@ class PackTest extends TestCase
      */
     public function testSmallGWithoutKey()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('incorrect format (g)');
+        }
         $format = 'g';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -761,6 +794,9 @@ class PackTest extends TestCase
      */
     public function testSmallGWithNumber()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character g (g4c-g)');
+        }
         $format = 'g4c-g';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -794,6 +830,9 @@ class PackTest extends TestCase
      */
     public function testBigEWithoutKey()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('incorrect format (E)');
+        }
         $format = 'E';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -805,6 +844,9 @@ class PackTest extends TestCase
      */
     public function testBigEWithNumber()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character E (E4c-E)');
+        }
         $format = 'E4c-E';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -816,6 +858,9 @@ class PackTest extends TestCase
      */
     public function testSmallEWithoutKey()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('incorrect format (e)');
+        }
         $format = 'e';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
@@ -827,6 +872,9 @@ class PackTest extends TestCase
      */
     public function testSmallEWithNumber()
     {
+        if (version_compare($this->phpVersion, '7.0.15', '<')) {
+            throw new \InvalidArgumentException('number must be empty for character e (e4c-e)');
+        }
         $format = 'e4c-e';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
