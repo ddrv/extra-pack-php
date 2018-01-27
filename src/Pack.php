@@ -14,6 +14,7 @@ class Pack
     {
         $result = '';
         $pack = self::parseFormat($format);
+        return $result;
         foreach ($pack as $key=>$meta) {
             if (!isset($data[$key])) {
                 throw new \InvalidArgumentException('undefined index '.$key.' in data array');
@@ -82,7 +83,7 @@ class Pack
     {
         $result = array();
         $regexp = '/^'
-            .'(?<character>[ahcsnvilqjfgdexmtorbAHCSNVILQPGEXZMTORB\@])'
+            .'(?<character>[ahcsnvilqfgdexmtorbAHCSNVILQJPGEXZMTORB\@])'
             .'(?<number>(\d+|\*))?'
             .'(?<key>[^\d][^:]+)'
             .'(:(?<added>(\-)?(\d+(\.\d+)?|\.\d+)))?'
@@ -110,12 +111,12 @@ class Pack
                     );
                 }
             } else {
-                if (strpos('tromb@TROMB', $match['character']) !== false && $match['number'] == '*') {
+                if (strpos('bort@BORT', $match['character']) !== false && $match['number'] == '*') {
                     throw new \InvalidArgumentException(
                         'incorrect number * for character '.$match['character']
                         .' ('.$item.')'
                     );
-                } elseif (strtolower($match['character']) != 'a') {
+                } elseif (strpos('borat@BORAT', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'number must be empty for character '.$match['character']
                         .' ('.$item.')'
