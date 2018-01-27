@@ -64,10 +64,14 @@ Currently implemented formats are:
 
 |Character|Is extras|Description|Support from PHP version|Number|Added|
 |---|---|---|---|---|---|
-|a|No|NUL-padded string|5.0|Length of string|No using|
-|A|No|SPACE-padded string|5.0|Length of string|No using|
+|@|No|NUL-fill to absolute position|5.0|Position|No using|
+|a|No|NUL-padded string|5.0|Length of string `may be *`|No using|
+|A|No|SPACE-padded string|5.0|Length of string `may be *`|No using|
 |h|No|Hex string, low nibble first|5.0|No using|No using|
 |H|No|Hex string, high nibble first|5.0|No using|No using|
+|x|No|NUL byte|5.0|No using|No using|
+|X|No|Back up one byte|5.0|No using|No using|
+|Z|No|NUL-padded string|5.5.0|No using|No using|
 |c|No|signed char|5.0|No using|Added number|
 |C|No|unsigned char|5.0|No using|Added number|
 |s|No|signed short (always 16 bit, machine byte order)|5.0|No using|Added number|
@@ -90,12 +94,8 @@ Currently implemented formats are:
 |d|No|double (machine dependent size and representation)|5.0|No using|Added number|
 |e|No|double (machine dependent size, little endian byte order)|7.0.15, 7.1.1|No using|Added number|
 |E|No|double (machine dependent size, big endian byte order)|7.0.15, 7.1.1|No using|Added number|
-|x|No|NUL byte|5.0|No using|No using|
-|X|No|Back up one byte|5.0|No using|No using|
-|Z|No|NUL-padded string (new in PHP 5.5)|5.5.0|No using|No using|
-|@|No|NUL-fill to absolute position|5.0|Position|No using|
 |m|Yes|signed medium (always 24 bit, machine byte order)|5.0|No using|Added number|
-|M|Yes|unsigned medium (always 24 bit, machine byte order)|5.0|Number of digits after the decimal point|Added number|
+|M|Yes|unsigned medium (always 24 bit, machine byte order)|5.0|No using|Added number|
 |t|Yes|signed tiny rounded (always 8 bit, machine byte order)|5.0|Number of digits after the decimal point|Added number|
 |T|Yes|unsigned tiny rounded (always 8 bit, machine byte order)|5.0|Number of digits after the decimal point|Added number|
 |o|Yes|signed short rounded (always 16 bit, machine byte order)|5.0|Number of digits after the decimal point|Added number|
