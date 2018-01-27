@@ -14,7 +14,6 @@ class Pack
     {
         $result = '';
         $pack = self::parseFormat($format);
-        return $result;
         foreach ($pack as $key=>$meta) {
             if (!isset($data[$key])) {
                 throw new \InvalidArgumentException('undefined index '.$key.' in data array');
@@ -47,9 +46,9 @@ class Pack
                 default: break;
             }
             $packFormat = $meta['character'].$meta['number'];
-            $bin = \pack($packFormat, $packValue);
+            //$bin = \pack($packFormat, $packValue);
 
-            $result .= $bin;
+            //$result .= $bin;
         }
         return $result;
     }
@@ -104,19 +103,19 @@ class Pack
              */
             if (empty($match['number'])) {
                 $match['number'] = '';
-                if (strpos('abort@ABORT', $match['character']) !== false) {
+                if (strpos('abort@ZABORT', $match['character']) !== false) {
                     throw new \InvalidArgumentException(
                         'number can not be empty for character '.$match['character']
                         .' ('.$item.')'
                     );
                 }
             } else {
-                if (strpos('bort@BORT', $match['character']) !== false && $match['number'] == '*') {
+                if (strpos('bort@BORTZ', $match['character']) !== false && $match['number'] == '*') {
                     throw new \InvalidArgumentException(
                         'incorrect number * for character '.$match['character']
                         .' ('.$item.')'
                     );
-                } elseif (strpos('borat@BORAT', $match['character']) === false) {
+                } elseif (strpos('borat@BORATZ', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'number must be empty for character '.$match['character']
                         .' ('.$item.')'

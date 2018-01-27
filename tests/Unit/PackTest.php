@@ -47,27 +47,29 @@ class PackTest extends TestCase
         parent::__construct($name, $data, $dataName);
         $this->phpVersion = phpversion();
         $this->data = array(
-            'c-@' => 'value',
-            'c-@*' => 'value',
-            'c-A' => 'value',
-            'c-A*' => 'value',
-            'c-a' => 'value',
-            'c-a*' => 'value',
-            'c-H' => base_convert(100, 10, 16),
-            'c-h' => base_convert(500, 10, 16),
-
-            'key3' => 2000.5,
+            'key01' => '',
+            'key02' => 'value',
+            'key03' => 'value',
+            'key04' => 'value',
+            'key05' => 'value',
+            'key06' => base_convert(100, 10, 16),
+            'key07' => base_convert(500, 10, 16),
+            'key08' => '',
+            'key09' => '',
+            'key5000' => 2000.5,
         );
         $this->format =
-            '@3c-@'
-            .'/A6c-A'
-            .'/A*c-A'
-            .'/a6c-A'
-            .'/a*c-A'
-            .'/Hc-H'
-            .'/hc-h'
+            '@3key01'
+            .'/A6key02'
+            .'/A*key03'
+            .'/a6key04'
+            .'/a*key05'
+            .'/Hkey06'
+            .'/hkey07'
+            .'/Xkey08'
+            .'/xkey09'
         ;
-        $this->len = 3+6+5+6+5+4+4;
+        $this->len = 3+6+5+6+5+4+4+1-1;
     }
 
     /**
@@ -83,33 +85,75 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character @ (@c-@)
+     * @expectedExceptionMessage number can not be empty for character @ (@key)
      */
     public function testAtWithoutNumber()
     {
-        $format = '@c-@';
+        $format = '@key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage incorrect number * for character @ (@*c-@*)
+     * @expectedExceptionMessage incorrect number * for character @ (@*key)
      */
     public function testAtWithNumberAsStar()
     {
-        $format = '@*c-@*';
+        $format = '@*key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character @ (@2c-@:125)
+     * @expectedExceptionMessage added must be empty for character @ (@2key:125)
      */
     public function testAtWithAdded()
     {
-        $format = '@2c-@:125';
+        $format = '@2key:125';
+        $binary = Pack::pack($format, $this->data);
+        unset($binary);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage incorrect format (Z)
+     */
+    public function testBigZWithoutKey()
+    {
+        if (version_compare($this->phpVersion, '5.5.0', '<')) {
+            throw new \InvalidArgumentException('incorrect format (Z)');
+        }
+        $format = 'Z';
+        $binary = Pack::pack($format, $this->data);
+        unset($binary);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage number can not be empty for character Z (Zkey)
+     */
+    public function testBigZWithoutNumber()
+    {
+        if (version_compare($this->phpVersion, '5.5.0', '<')) {
+            throw new \InvalidArgumentException('number can not be empty for character Z (Zkey)');
+        }
+        $format = 'Zkey';
+        $binary = Pack::pack($format, $this->data);
+        unset($binary);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage added must be empty for character Z (Z2key:125)
+     */
+    public function testBigZWithAdded()
+    {
+        if (version_compare($this->phpVersion, '5.5.0', '<')) {
+            throw new \InvalidArgumentException('added must be empty for character Z (Z2key:125)');
+        }
+        $format = 'Z2key:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -127,22 +171,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character A (Ac-A)
+     * @expectedExceptionMessage number can not be empty for character A (Akey)
      */
     public function testBigAWithoutNumber()
     {
-        $format = 'Ac-A';
+        $format = 'Akey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character A (A2c-A:125)
+     * @expectedExceptionMessage added must be empty for character A (A2key:125)
      */
     public function testBigAWithAdded()
     {
-        $format = 'A2c-A:125';
+        $format = 'A2key:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -160,22 +204,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character a (ac-a)
+     * @expectedExceptionMessage number can not be empty for character a (akey)
      */
     public function testSmallAWithoutNumber()
     {
-        $format = 'ac-a';
+        $format = 'akey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character a (a2c-a:125)
+     * @expectedExceptionMessage added must be empty for character a (a2key:125)
      */
     public function testSmallAWithAdded()
     {
-        $format = 'a2c-a:125';
+        $format = 'a2key:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -193,22 +237,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character H (H4c-H)
+     * @expectedExceptionMessage number must be empty for character H (H4key)
      */
     public function testBigHWithNumber()
     {
-        $format = 'H4c-H';
+        $format = 'H4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character H (Hc-H:125)
+     * @expectedExceptionMessage added must be empty for character H (Hkey:125)
      */
     public function testBigHWithAdded()
     {
-        $format = 'Hc-H:125';
+        $format = 'Hkey:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -226,22 +270,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character h (h4c-h)
+     * @expectedExceptionMessage number must be empty for character h (h4key)
      */
     public function testSmallHWithNumber()
     {
-        $format = 'h4c-h';
+        $format = 'h4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character h (hc-h:125)
+     * @expectedExceptionMessage added must be empty for character h (hkey:125)
      */
     public function testSmallHWithAdded()
     {
-        $format = 'hc-h:125';
+        $format = 'hkey:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -259,22 +303,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character X (X4c-X)
+     * @expectedExceptionMessage number must be empty for character X (X4key)
      */
     public function testBigXWithNumber()
     {
-        $format = 'X4c-X';
+        $format = 'X4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character X (Xc-X:125)
+     * @expectedExceptionMessage added must be empty for character X (Xkey:125)
      */
     public function testBigXWithAdded()
     {
-        $format = 'Xc-X:125';
+        $format = 'Xkey:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -292,58 +336,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character x (x4c-x)
+     * @expectedExceptionMessage number must be empty for character x (x4key)
      */
     public function testSmallXWithNumber()
     {
-        $format = 'x4c-x';
+        $format = 'x4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character x (xc-x:125)
+     * @expectedExceptionMessage added must be empty for character x (xkey:125)
      */
     public function testSmallXWithAdded()
     {
-        $format = 'xc-x:125';
-        $binary = Pack::pack($format, $this->data);
-        unset($binary);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage incorrect format (Z)
-     */
-    public function testBigZWithoutKey()
-    {
-        $format = 'Z';
-        $binary = Pack::pack($format, $this->data);
-        unset($binary);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character Z (Z4c-Z)
-     */
-    public function testBigZWithNumber()
-    {
-        $format = 'Z4c-Z';
-        $binary = Pack::pack($format, $this->data);
-        unset($binary);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage added must be empty for character Z (Zc-Z:125)
-     */
-    public function testBigZWithAdded()
-    {
-        if (version_compare($this->phpVersion, '5.5.0', '<')) {
-            throw new \InvalidArgumentException('added must be empty for character Z (Zc-Z:125)');
-        }
-        $format = 'Zc-Z:125';
+        $format = 'xkey:125';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -361,11 +369,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character C (C4c-C)
+     * @expectedExceptionMessage number must be empty for character C (C4key)
      */
     public function testBigCWithNumber()
     {
-        $format = 'C4c-C';
+        $format = 'C4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -383,11 +391,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character c (c4c-c)
+     * @expectedExceptionMessage number must be empty for character c (c4key)
      */
     public function testSmallCWithNumber()
     {
-        $format = 'c4c-c';
+        $format = 'c4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -405,11 +413,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character S (S4c-S)
+     * @expectedExceptionMessage number must be empty for character S (S4key)
      */
     public function testBigSWithNumber()
     {
-        $format = 'S4c-S';
+        $format = 'S4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -427,11 +435,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character s (s4c-s)
+     * @expectedExceptionMessage number must be empty for character s (s4key)
      */
     public function testSmallSWithNumber()
     {
-        $format = 's4c-s';
+        $format = 's4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -449,11 +457,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character N (N4c-N)
+     * @expectedExceptionMessage number must be empty for character N (N4key)
      */
     public function testBigNWithNumber()
     {
-        $format = 'N4c-N';
+        $format = 'N4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -471,11 +479,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character n (n4c-n)
+     * @expectedExceptionMessage number must be empty for character n (n4key)
      */
     public function testSmallNWithNumber()
     {
-        $format = 'n4c-n';
+        $format = 'n4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -493,11 +501,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character V (V4c-V)
+     * @expectedExceptionMessage number must be empty for character V (V4key)
      */
     public function testBigVWithNumber()
     {
-        $format = 'V4c-V';
+        $format = 'V4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -515,11 +523,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character v (v4c-v)
+     * @expectedExceptionMessage number must be empty for character v (v4key)
      */
     public function testSmallVWithNumber()
     {
-        $format = 'v4c-v';
+        $format = 'v4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -537,11 +545,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character I (I4c-I)
+     * @expectedExceptionMessage number must be empty for character I (I4key)
      */
     public function testBigIWithNumber()
     {
-        $format = 'I4c-I';
+        $format = 'I4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -559,11 +567,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character i (i4c-i)
+     * @expectedExceptionMessage number must be empty for character i (i4key)
      */
     public function testSmallIWithNumber()
     {
-        $format = 'i4c-i';
+        $format = 'i4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -581,11 +589,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character L (L4c-L)
+     * @expectedExceptionMessage number must be empty for character L (L4key)
      */
     public function testBigLWithNumber()
     {
-        $format = 'L4c-L';
+        $format = 'L4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -603,11 +611,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character l (l4c-l)
+     * @expectedExceptionMessage number must be empty for character l (l4key)
      */
     public function testSmallLWithNumber()
     {
-        $format = 'l4c-l';
+        $format = 'l4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -628,14 +636,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character Q (Q4c-Q)
+     * @expectedExceptionMessage number must be empty for character Q (Q4key)
      */
     public function testBigQWithNumber()
     {
         if (version_compare($this->phpVersion, '5.6.3', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character Q (Q4c-Q)');
+            throw new \InvalidArgumentException('number must be empty for character Q (Q4key)');
         }
-        $format = 'Q4c-Q';
+        $format = 'Q4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -656,14 +664,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character q (q4c-q)
+     * @expectedExceptionMessage number must be empty for character q (q4key)
      */
     public function testSmallQWithNumber()
     {
         if (version_compare($this->phpVersion, '5.6.3', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character q (q4c-q)');
+            throw new \InvalidArgumentException('number must be empty for character q (q4key)');
         }
-        $format = 'q4c-q';
+        $format = 'q4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -684,14 +692,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character J (J4c-J)
+     * @expectedExceptionMessage number must be empty for character J (J4key)
      */
     public function testBigJWithNumber()
     {
         if (version_compare($this->phpVersion, '5.6.3', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character J (J4c-J)');
+            throw new \InvalidArgumentException('number must be empty for character J (J4key)');
         }
-        $format = 'J4c-J';
+        $format = 'J4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -712,14 +720,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character P (P4c-P)
+     * @expectedExceptionMessage number must be empty for character P (P4key)
      */
     public function testBigPWithNumber()
     {
         if (version_compare($this->phpVersion, '5.6.3', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character P (P4c-P)');
+            throw new \InvalidArgumentException('number must be empty for character P (P4key)');
         }
-        $format = 'P4c-P';
+        $format = 'P4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -737,11 +745,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character f (f4c-f)
+     * @expectedExceptionMessage number must be empty for character f (f4key)
      */
     public function testSmallFWithNumber()
     {
-        $format = 'f4c-f';
+        $format = 'f4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -762,14 +770,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character G (G4c-G)
+     * @expectedExceptionMessage number must be empty for character G (G4key)
      */
     public function testBigGWithNumber()
     {
         if (version_compare($this->phpVersion, '7.0.15', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character G (G4c-G)');
+            throw new \InvalidArgumentException('number must be empty for character G (G4key)');
         }
-        $format = 'G4c-G';
+        $format = 'G4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -790,14 +798,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character g (g4c-g)
+     * @expectedExceptionMessage number must be empty for character g (g4key)
      */
     public function testSmallGWithNumber()
     {
         if (version_compare($this->phpVersion, '7.0.15', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character g (g4c-g)');
+            throw new \InvalidArgumentException('number must be empty for character g (g4key)');
         }
-        $format = 'g4c-g';
+        $format = 'g4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -815,11 +823,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character d (d4c-d)
+     * @expectedExceptionMessage number must be empty for character d (d4key)
      */
     public function testSmallDWithNumber()
     {
-        $format = 'd4c-d';
+        $format = 'd4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -840,14 +848,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character E (E4c-E)
+     * @expectedExceptionMessage number must be empty for character E (E4key)
      */
     public function testBigEWithNumber()
     {
         if (version_compare($this->phpVersion, '7.0.15', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character E (E4c-E)');
+            throw new \InvalidArgumentException('number must be empty for character E (E4key)');
         }
-        $format = 'E4c-E';
+        $format = 'E4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -868,14 +876,14 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character e (e4c-e)
+     * @expectedExceptionMessage number must be empty for character e (e4key)
      */
     public function testSmallEWithNumber()
     {
         if (version_compare($this->phpVersion, '7.0.15', '<')) {
-            throw new \InvalidArgumentException('number must be empty for character e (e4c-e)');
+            throw new \InvalidArgumentException('number must be empty for character e (e4key)');
         }
-        $format = 'e4c-e';
+        $format = 'e4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -893,11 +901,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character M (M4c-M)
+     * @expectedExceptionMessage number must be empty for character M (M4key)
      */
     public function testBigMWithNumber()
     {
-        $format = 'M4c-M';
+        $format = 'M4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -915,11 +923,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character m (m4c-m)
+     * @expectedExceptionMessage number must be empty for character m (m4key)
      */
     public function testSmallMWithNumber()
     {
-        $format = 'm4c-m';
+        $format = 'm4key';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -937,11 +945,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character T (Tc-T)
+     * @expectedExceptionMessage number can not be empty for character T (Tkey)
      */
     public function testBigTWithoutNumber()
     {
-        $format = 'Tc-T';
+        $format = 'Tkey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -959,11 +967,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character t (tc-t)
+     * @expectedExceptionMessage number can not be empty for character t (tkey)
      */
     public function testSmallTWithoutNumber()
     {
-        $format = 'tc-t';
+        $format = 'tkey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -981,11 +989,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character R (Rc-R)
+     * @expectedExceptionMessage number can not be empty for character R (Rkey)
      */
     public function testBigRWithoutNumber()
     {
-        $format = 'Rc-R';
+        $format = 'Rkey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -1003,11 +1011,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character r (rc-r)
+     * @expectedExceptionMessage number can not be empty for character r (rkey)
      */
     public function testSmallRWithoutNumber()
     {
-        $format = 'rc-r';
+        $format = 'rkey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -1025,11 +1033,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character O (Oc-O)
+     * @expectedExceptionMessage number can not be empty for character O (Okey)
      */
     public function testBigOWithoutNumber()
     {
-        $format = 'Oc-O';
+        $format = 'Okey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -1047,11 +1055,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character o (oc-o)
+     * @expectedExceptionMessage number can not be empty for character o (okey)
      */
     public function testSmallOWithoutNumber()
     {
-        $format = 'oc-o';
+        $format = 'okey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -1069,11 +1077,11 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character B (Bc-B)
+     * @expectedExceptionMessage number can not be empty for character B (Bkey)
      */
     public function testBigBWithoutNumber()
     {
-        $format = 'Bc-B';
+        $format = 'Bkey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }
@@ -1091,11 +1099,22 @@ class PackTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number can not be empty for character b (bc-b)
+     * @expectedExceptionMessage number can not be empty for character b (bkey)
      */
     public function testSmallBWithoutNumber()
     {
-        $format = 'bc-b';
+        $format = 'bkey';
+        $binary = Pack::pack($format, $this->data);
+        unset($binary);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage undefined index undefinedKey in data array
+     */
+    public function testUndefinedKey()
+    {
+        $format = 'A5undefinedKey';
         $binary = Pack::pack($format, $this->data);
         unset($binary);
     }

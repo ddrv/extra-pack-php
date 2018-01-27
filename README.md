@@ -65,13 +65,13 @@ Currently implemented formats are:
 |Character|Is extras|Description|Support from PHP version|Number|Added|
 |---|---|---|---|---|---|
 |@|No|NUL-fill to absolute position|5.0|Position|No using|
+|Z|No|NUL-padded string|5.5.0|Length of string|No using|
 |a|No|NUL-padded string|5.0|Length of string `may be *`|No using|
 |A|No|SPACE-padded string|5.0|Length of string `may be *`|No using|
 |h|No|Hex string, low nibble first|5.0|No using|No using|
 |H|No|Hex string, high nibble first|5.0|No using|No using|
 |x|No|NUL byte|5.0|No using|No using|
 |X|No|Back up one byte|5.0|No using|No using|
-|Z|No|NUL-padded string|5.5.0|No using|No using|
 |c|No|signed char|5.0|No using|Added number|
 |C|No|unsigned char|5.0|No using|Added number|
 |s|No|signed short (always 16 bit, machine byte order)|5.0|No using|Added number|
