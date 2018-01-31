@@ -4,6 +4,7 @@ namespace Ddrv\Test\Extra\Pack;
 
 use PHPUnit\Framework\TestCase;
 use Ddrv\Extra\Pack;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * @covers Pack
@@ -47,29 +48,89 @@ class PackTest extends TestCase
         parent::__construct($name, $data, $dataName);
         $this->phpVersion = phpversion();
         $this->data = array(
-            'key01' => '',
+            'key01' => 'value',
             'key02' => 'value',
             'key03' => 'value',
             'key04' => 'value',
-            'key05' => 'value',
-            'key06' => base_convert(100, 10, 16),
-            'key07' => base_convert(500, 10, 16),
-            'key08' => '',
-            'key09' => '',
-            'key5000' => 2000.5,
+            'key05' => dechex(10),
+            'key06' => dechex(10),
+            'key07' => 120,
+            'key08' => -120,
+            'key09' => 100120,
+            'key10' => -100120,
+            'key11' => 5000,
+            'key12' => -5000,
+            'key13' => 71000,
+            'key14' => -71000,
+            'key15' => 60000,
+            'key16' => 71000,
+            'key17' => 60000,
+            'key18' => 71000,
+            'key19' => 71000,
+            'key20' => -71000,
+            'key21' => 160000,
+            'key22' => -160000,
+            'key23' => 16000000,
+            'key24' => -16000000,
+            'key25' => 32000000,
+            'key26' => -32000000,
         );
         $this->format =
-            '@3key01'
-            .'/A6key02'
-            .'/A*key03'
-            .'/a6key04'
-            .'/a*key05'
-            .'/Hkey06'
-            .'/hkey07'
-            .'/Xkey08'
-            .'/xkey09'
+            'A5key01'
+            .'/a6key03'
+            .'/Hkey05'
+            .'/hkey06'
+            .'/Ckey07'
+            .'/ckey08'
+            .'/Ckey09:100000'
+            .'/ckey10:-100000'
+            .'/Skey11'
+            .'/skey12'
+            .'/Skey13:66000'
+            .'/skey14:-66000'
+            .'/nkey15'
+            .'/nkey16:66000'
+            .'/vkey17'
+            .'/vkey18:66000'
+            .'/Mkey19'
+            .'/mkey20'
+            .'/Mkey21:80000'
+            .'/mkey22:-80000'
+            .'/Mkey19'
+            .'/mkey20'
+            .'/Mkey21:80000'
+            .'/mkey22:-80000'
+            .'/Lkey23'
+            .'/lkey24'
+            .'/Lkey25:80000'
+            .'/lkey26:-80000'
         ;
-        $this->len = 3+6+5+6+5+4+4+1-1;
+        $this->len =
+            5
+            +6
+            +1
+            +1
+            +1
+            +1
+            +1
+            +1
+            +2
+            +2
+            +2
+            +2
+            +2
+            +2
+            +2
+            +2
+            +3
+            +3
+            +3
+            +3
+            +4
+            +4
+            +4
+            +4
+        ;
     }
 
     /**
@@ -301,15 +362,18 @@ class PackTest extends TestCase
         unset($binary);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character X (X4key)
-     */
     public function testBigXWithNumber()
     {
-        $format = 'X4key';
+        $format = 'x4key1/X3key2';
         $binary = Pack::pack($format, $this->data);
-        unset($binary);
+        $this->assertSame(1,strlen($binary));
+    }
+
+    public function testBigXWithoutNumber()
+    {
+        $format = 'x4key1/Xkey2';
+        $binary = Pack::pack($format, $this->data);
+        $this->assertSame(3,strlen($binary));
     }
 
     /**
@@ -334,15 +398,18 @@ class PackTest extends TestCase
         unset($binary);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage number must be empty for character x (x4key)
-     */
     public function testSmallXWithNumber()
     {
-        $format = 'x4key';
+        $format = 'x5key';
         $binary = Pack::pack($format, $this->data);
-        unset($binary);
+        $this->assertSame(5,strlen($binary));
+    }
+
+    public function testSmallXWithoutNumber()
+    {
+        $format = 'xkey';
+        $binary = Pack::pack($format, $this->data);
+        $this->assertSame(1,strlen($binary));
     }
 
     /**
@@ -1125,6 +1192,14 @@ class PackTest extends TestCase
     public function testCorrect()
     {
         $binary = Pack::pack($this->format, $this->data);
-        $result = Pack::unpack($this->format, $this->data);
+        $this->assertSame($this->len, strlen($binary));
+        $result = Pack::unpack($this->format, $binary);
+        foreach ($this->data as $key=>$value) {
+            if (isset($result[$key])) {
+                $actual = is_string($result[$key])?trim($result[$key]):$result[$key];
+                $this->assertSame($value, $actual);
+            }
+        }
+
     }
 }

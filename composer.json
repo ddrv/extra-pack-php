@@ -1,7 +1,7 @@
 {
-  "name": "ddrv/extrapack",
-  "version": "1.0.0",
-  "time": "2018-01-26 10:42:21",
+  "name": "ddrv/extra-pack",
+  "version": "0.9.0-beta",
+  "time": "2018-01-31 13:59:21",
   "type": "library",
   "description": "Extras for pack() and unpack() functions",
   "keywords": ["pack", "unpack", "binary", "binary-string", "binary-data", "extras"],
@@ -21,7 +21,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Ddrv\\Extrapack\\": "src/"
+      "Ddrv\\Extra\\Pack\\": "src/"
     }
   }
 }

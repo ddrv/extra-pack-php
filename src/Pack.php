@@ -4,6 +4,43 @@ namespace Ddrv\Extra;
 
 class Pack
 {
+    protected static function getSize($character)
+    {
+        switch ($character) {
+            case 'c': // no break
+            case 'C': // no break
+            case 't': // no break
+            case 'h': // no break
+            case 'H': // no break
+            case 'T': return 1;
+            case 's': // no break
+            case 'S': // no break
+            case 'n': // no break
+            case 'v': // no break
+            case 'o': // no break
+            case 'O': return 2;
+            case 'm': // no break
+            case 'M': // no break
+            case 'r': // no break
+            case 'R': return 3;
+            case 'l': // no break
+            case 'L': // no break
+            case 'N': // no break
+            case 'V': // no break
+            case 'b': // no break
+            case 'B': return 4;
+            case 'q': // no break
+            case 'Q': // no break
+            case 'J': // no break
+            case 'P': return 8;
+            default:
+                if (in_array($character, array('I','i','f','G','g','d','E','e'))) {
+                    return strlen(pack($character, 1));
+                }
+                return false;
+        }
+    }
+
     /**
      * @param string $format
      * @param array $data
@@ -15,40 +52,61 @@ class Pack
         $result = '';
         $pack = self::parseFormat($format);
         foreach ($pack as $key=>$meta) {
-            if (!isset($data[$key])) {
+            if (!in_array($meta['character'], array('@','x','X')) && !isset($data[$key])) {
                 throw new \InvalidArgumentException('undefined index '.$key.' in data array');
             }
-            $packValue = $data[$key];
+            $packValue = isset($data[$key])?$data[$key]:null;
             if (!empty($meta['added'])) {
                 $packValue = $data[$key]-$meta['added'];
             }
+
             switch ($meta['character']) {
+                case '@':
+                    if(empty($meta['number'])) $meta['number'] = 1;
+                    $result = substr($result,0,$meta['number']);
+                    break;
+                case 'x':
+                    $result .= \pack($meta['character'].$meta['number']);
+                    break;
+                case 'X':
+                    if(empty($meta['number'])) $meta['number'] = 1;
+                    $result = substr($result,0,-$meta['number']);
+                    break;
                 case 't':
+                    $result .= \pack('c', (int)($packValue*pow(10,$meta['number'])));
                     break;
                 case 'T':
+                    $result .= \pack('C', (int)($packValue*pow(10,$meta['number'])));
                     break;
                 case 'o':
+                    $result .= \pack('s', (int)($packValue*pow(10,$meta['number'])));
                     break;
                 case 'O':
+                    $result .= \pack('S', (int)($packValue*pow(10,$meta['number'])));
                     break;
                 case 'r':
+                    $result .= substr(\pack('l', (int)($packValue*pow(10,$meta['number']))),0,3);
                     break;
                 case 'R':
+                    $result .= substr(\pack('L', (int)($packValue*pow(10,$meta['number']))),0,3);
                     break;
                 case 'b':
+                    $result .= \pack('l', (int)($packValue*pow(10,$meta['number'])));
                     break;
                 case 'B':
+                    $result .= \pack('L', (int)($packValue*pow(10,$meta['number'])));
                     break;
                 case 'm':
+                    $result .= substr(\pack('l', $packValue),0,3);
                     break;
                 case 'M':
+                    $result .= substr(\pack('L', $packValue),0,3);
                     break;
-                default: break;
+                default:
+                    if(empty($meta['number'])) $meta['number'] = 1;
+                    $result .= \pack($meta['character'].$meta['number'], $packValue);
+                    break;
             }
-            $packFormat = $meta['character'].$meta['number'];
-            //$bin = \pack($packFormat, $packValue);
-
-            //$result .= $bin;
         }
         return $result;
     }
@@ -60,7 +118,73 @@ class Pack
      */
     public static function unpack($format, $string)
     {
-        return array();
+        $result = array();
+        $pack = self::parseFormat($format);
+        foreach ($pack as $key=>$meta) {
+            $len = self::getSize($meta['character']);
+            if (!$len) {
+                if ($meta['number'] == '*') {
+                    $len = strlen($string);
+                } else {
+                    $len = $meta['number'];
+                }
+            }
+            $bin = substr($string,0,$len);
+            $string = substr($string,$len);
+            switch ($meta['character']) {
+                case '@': // no break
+                case 'x': // no break
+                case 'X':
+                    break;
+                case 'a': // no break
+                case 'A':
+                $result[$key] = $bin;
+                    break;
+                case 't':
+
+                    $array = \unpack('ckey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
+                    break;
+                case 'T':
+                    $array = \unpack('Ckey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
+                    break;
+                case 'o':
+                    //$result .= \pack('s', (int)($packValue*pow(10,$meta['number'])));
+                    break;
+                case 'O':
+                    //$result .= \pack('S', (int)($packValue*pow(10,$meta['number'])));
+                    break;
+                case 'r':
+                    //$result .= substr(\pack('l', (int)($packValue*pow(10,$meta['number']))),0,3);
+                    break;
+                case 'R':
+                    //$result .= substr(\pack('L', (int)($packValue*pow(10,$meta['number']))),0,3);
+                    break;
+                case 'b':
+                    //$result .= \pack('l', (int)($packValue*pow(10,$meta['number'])));
+                    break;
+                case 'B':
+                    //$result .= \pack('L', (int)($packValue*pow(10,$meta['number'])));
+                    break;
+                case 'm':
+                    //$result .= substr(\pack('l', $packValue),0,3);
+                    break;
+                case 'M':
+                    $bin .= (ord($bin{2}) >> 7 ? "\xff" : "\0");
+                    $array = \unpack('Lkey', $bin);
+                    $result[$key] = $array['key'];
+                    break;
+                default:
+                    $array = \unpack($meta['character'].$meta['number'].'key', $bin);
+                    $result[$key] = $array['key'];
+                    break;
+            }
+            if (!empty($meta['added']) && isset($result[$key])) {
+                $result[$key] += $meta['added'];
+            }
+        }
+        return $result;
     }
 
     /**
@@ -110,12 +234,12 @@ class Pack
                     );
                 }
             } else {
-                if (strpos('bort@BORTZ', $match['character']) !== false && $match['number'] == '*') {
+                if (strpos('bortx@BORTZX', $match['character']) !== false && $match['number'] == '*') {
                     throw new \InvalidArgumentException(
                         'incorrect number * for character '.$match['character']
                         .' ('.$item.')'
                     );
-                } elseif (strpos('borat@BORATZ', $match['character']) === false) {
+                } elseif (strpos('boratx@BORATZX', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'number must be empty for character '.$match['character']
                         .' ('.$item.')'
