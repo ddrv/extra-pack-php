@@ -74,6 +74,10 @@ class PackTest extends TestCase
             'key24' => -16000000,
             'key25' => 32000000,
             'key26' => -32000000,
+            'key27' =>.0001,
+            'key28' =>.1365,
+            'key29' =>.83961,
+            'key30' =>3.14159265,
         );
         $this->format =
             'A5key01'
@@ -104,6 +108,10 @@ class PackTest extends TestCase
             .'/lkey24'
             .'/Lkey25:80000'
             .'/lkey26:-80000'
+            .'/t4key27'
+            .'/o4key28'
+            .'/r5key29'
+            .'/b8key30'
         ;
         $this->len =
             5
@@ -129,6 +137,10 @@ class PackTest extends TestCase
             +4
             +4
             +4
+            +4
+            +1
+            +2
+            +3
             +4
         ;
     }

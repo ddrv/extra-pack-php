@@ -141,7 +141,6 @@ class Pack
                 $result[$key] = $bin;
                     break;
                 case 't':
-
                     $array = \unpack('ckey', $bin);
                     $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
@@ -150,25 +149,35 @@ class Pack
                     $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'o':
-                    //$result .= \pack('s', (int)($packValue*pow(10,$meta['number'])));
+                    $array = \unpack('skey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'O':
-                    //$result .= \pack('S', (int)($packValue*pow(10,$meta['number'])));
+                    $array = \unpack('Skey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'r':
-                    //$result .= substr(\pack('l', (int)($packValue*pow(10,$meta['number']))),0,3);
+                    $bin .= (ord($bin{2}) >> 7 ? "\xff" : "\0");
+                    $array = \unpack('lkey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'R':
-                    //$result .= substr(\pack('L', (int)($packValue*pow(10,$meta['number']))),0,3);
+                    $bin .= (ord($bin{2}) >> 7 ? "\xff" : "\0");
+                    $array = \unpack('Lkey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'b':
-                    //$result .= \pack('l', (int)($packValue*pow(10,$meta['number'])));
+                    $array = \unpack('lkey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'B':
-                    //$result .= \pack('L', (int)($packValue*pow(10,$meta['number'])));
+                    $array = \unpack('Lkey', $bin);
+                    $result[$key] = $array['key']/pow(10,$meta['number']);
                     break;
                 case 'm':
-                    //$result .= substr(\pack('l', $packValue),0,3);
+                    $bin .= (ord($bin{2}) >> 7 ? "\xff" : "\0");
+                    $array = \unpack('lkey', $bin);
+                    $result[$key] = $array['key'];
                     break;
                 case 'M':
                     $bin .= (ord($bin{2}) >> 7 ? "\xff" : "\0");
