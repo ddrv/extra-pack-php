@@ -218,31 +218,33 @@ class Pack
         $checkedAdded = $added = $maximal - $difference;
         if (is_int($difference)) {
             $character = $precision?'B':'L';
+            $added = $maximal - $difference;
             if ($checkedAdded < (1 << 31)) {
                 $character = $precision?'b':'l';
-                $tmpAdded = 0;
+                $added = $maximal - $difference + (1 << 31);
             }
             if ($maximal < (1 << 24)) {
                 $character = $precision?'R':'M';
+                $added = $maximal - $difference;
                 if ($checkedAdded < (1 << 23)) {
                     $character = $precision?'r':'m';
-                    $tmpAdded = 0;
+                    $added = $maximal - $difference + (1 << 23);
                 }
             }
             if ($maximal < (1 << 16)) {
                 $character = $precision?'O':'S';
+                $added = $maximal - $difference;
                 if ($checkedAdded < (1 << 15)) {
-
                     $character = $precision?'o':'s';
-
+                    $added = $maximal - $difference + (1 << 15);
                 }
             }
             if ($maximal < (1 << 8)) {
                 $character = $precision?'T':'C';
                 $added = $maximal - $difference;
                 if ($checkedAdded < (1 << 7)) {
-                    $added = $maximal - $difference + (1 << 7);
                     $character = $precision?'t':'c';
+                    $added = $maximal - $difference + (1 << 7);
                 }
             }
         }
