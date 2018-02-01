@@ -1212,6 +1212,26 @@ class PackTest extends TestCase
                 $this->assertSame($value, $actual);
             }
         }
+    }
 
+    /**
+     * Correct case
+     */
+    public function testOptimalFormat()
+    {
+        $format = Pack::getOptimalFormat(-128, 127);
+        $this->assertSame('ckey', $format);
+
+        $format = Pack::getOptimalFormat(127, -128, 'char');
+        $this->assertSame('cchar', $format);
+
+        $format = Pack::getOptimalFormat(-129, 126, 'char');
+        $this->assertSame('cchar:-1', $format);
+
+        $format = Pack::getOptimalFormat(-127, 128, 'char');
+        $this->assertSame('cchar:1', $format);
+
+        $format = Pack::getOptimalFormat(-12.8, 12.7, 'char',1);
+        $this->assertSame('t1char', $format);
     }
 }

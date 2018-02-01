@@ -199,11 +199,55 @@ class Pack
     /**
      * @param mixed $minimal
      * @param mixed $maximal
+     * @param string $key
+     * @param int $precision
      * @return string
      */
-    public static function getOptimalFormat($minimal, $maximal)
+    public static function getOptimalFormat($minimal, $maximal, $key='key', $precision=0)
     {
-        return '';
+        if ($minimal > $maximal) {
+            $tmp = $maximal;
+            $maximal = $minimal;
+            $minimal = $tmp;
+            unset($tmp);
+        }
+        $maximal = (int)($maximal*pow(10, $precision));
+        $minimal = (int)($minimal*pow(10, $precision));
+        $character = 'd';
+        $difference = $maximal-$minimal;
+        $checkedAdded = $added = $maximal - $difference;
+        if (is_int($difference)) {
+            $character = $precision?'B':'L';
+            if ($checkedAdded < (1 << 31)) {
+                $character = $precision?'b':'l';
+                $tmpAdded = 0;
+            }
+            if ($maximal < (1 << 24)) {
+                $character = $precision?'R':'M';
+                if ($checkedAdded < (1 << 23)) {
+                    $character = $precision?'r':'m';
+                    $tmpAdded = 0;
+                }
+            }
+            if ($maximal < (1 << 16)) {
+                $character = $precision?'O':'S';
+                if ($checkedAdded < (1 << 15)) {
+
+                    $character = $precision?'o':'s';
+
+                }
+            }
+            if ($maximal < (1 << 8)) {
+                $character = $precision?'T':'C';
+                $added = $maximal - $difference;
+                if ($checkedAdded < (1 << 7)) {
+                    $added = $maximal - $difference + (1 << 7);
+                    $character = $precision?'t':'c';
+                }
+            }
+        }
+        $number = $precision?$precision:'';
+        return $character.$number.$key.($added?':'.$added:'');
     }
 
     /**
