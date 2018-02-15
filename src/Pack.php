@@ -52,7 +52,7 @@ class Pack
         $result = '';
         $pack = self::parseFormat($format);
         foreach ($pack as $key=>$meta) {
-            if (!in_array($meta['character'], array('@','x','X')) && !array_key_exists('p', $data)) {
+            if (!in_array($meta['character'], array('@','x','X')) && !array_key_exists($key, $data)) {
                 throw new \InvalidArgumentException('undefined index '.$key.' in data array');
             }
             $packValue = isset($data[$key])?$data[$key]:null;
