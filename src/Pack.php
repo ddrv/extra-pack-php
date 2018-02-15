@@ -65,7 +65,7 @@ class Pack
                     if(empty($meta['number'])) $meta['number'] = 1;
                     $result = substr($result,0,$meta['number']);
                     break;
-                case '#':
+                case '~':
                     $result .= \pack('A*x1', $packValue);
                     break;
                 case 'x':
@@ -129,7 +129,7 @@ class Pack
             if (!$len) {
                 if ($meta['number'] == '*') {
                     $len = strlen($string);
-                } elseif ($meta['character'] == '#') {
+                } elseif ($meta['character'] == '~') {
                     $len = strpos($string, "\0");
                     if ($len === false) {
                         $len = strlen($string);
@@ -147,7 +147,7 @@ class Pack
                 case 'x': // no break
                 case 'X':
                     break;
-                case '#': // no break
+                case '~': // no break
                 case 'a': // no break
                 case 'A':
                     $result[$key] = $bin;
@@ -276,7 +276,7 @@ class Pack
     {
         $result = array();
         $regexp = '/^'
-            .'(?<character>[ahcsnvilqfgdexmtorbAHCSNVILQJPGEXZMTORB\@\#])'
+            .'(?<character>[ahcsnvilqfgdexmtorbAHCSNVILQJPGEXZMTORB\@\~])'
             .'(?<number>(\d+|\*))?'
             .'(?<key>[^\d:][^:]*)'
             .'(:(?<added>(\-)?(\d+(\.\d+)?|\.\d+)))?'
@@ -304,12 +304,12 @@ class Pack
                     );
                 }
             } else {
-                if (strpos('bortx@BORTZX#', $match['character']) !== false && $match['number'] == '*') {
+                if (strpos('bortx@BORTZX~', $match['character']) !== false && $match['number'] == '*') {
                     throw new \InvalidArgumentException(
                         'incorrect number * for character '.$match['character']
                         .' ('.$item.')'
                     );
-                } elseif (strpos('boratx@BORATZX#', $match['character']) === false) {
+                } elseif (strpos('boratx@BORATZX~', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'number must be empty for character '.$match['character']
                         .' ('.$item.')'
@@ -323,7 +323,7 @@ class Pack
             if (empty($match['added'])) {
                 $match['added'] = 0;
             } else {
-                if (strpos('cslnvqfgdtrombCSLNVQJPGETROMB#', $match['character']) === false) {
+                if (strpos('cslnvqfgdtrombCSLNVQJPGETROMB~', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'added must be empty for character '.$match['character']
                         .' ('.$item.')'

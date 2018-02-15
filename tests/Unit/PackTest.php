@@ -1236,29 +1236,29 @@ class PackTest extends TestCase
     }
 
     /**
-     * Correct # pack
+     * Correct ~ pack
      */
-    public function testHashCharacterPack()
+    public function testStringFloatPack()
     {
         $data = array(
             'foo' => 'peow peow!!!',
         );
         $lenRaw = strlen($data['foo']);
-        $binary = Pack::pack('#foo', $data);
+        $binary = Pack::pack('~foo', $data);
         $lenBin = strlen($binary);
         $this->assertSame($lenRaw+1, $lenBin);
     }
 
     /**
-     * Correct # unpack
+     * Correct ~ unpack
      */
-    public function testHashCharacterUnpack()
+    public function testStringFloatUnpack()
     {
         $data = array(
             'foo' => 'peow peow!!!',
             'bar' => 'it is a foo bar',
         );
-        $format = '#foo/#bar';
+        $format = '~foo/~bar';
         $binary = Pack::pack($format, $data);
         $unpack = Pack::unpack($format, $binary);
         $this->assertSame($data['foo'], $unpack['foo']);

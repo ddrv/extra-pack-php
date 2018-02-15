@@ -65,7 +65,7 @@ Currently implemented formats are:
 |Character|Is extras|Description|Support from PHP version|Number|Added|
 |---|---|---|---|---|---|
 |@|No|NUL-fill to absolute position|5.0|Position|No using|
-|#|Yes|NUL-ended string|5.0|No using|No using|
+|~|Yes|NUL-ended string|5.0|No using|No using|
 |Z|No|NUL-padded string|5.5.0|Length of string|No using|
 |x|No|NUL byte|5.0|Count iterations|No using|
 |X|No|Back up one byte|5.0|Length of reserved string|No using|
