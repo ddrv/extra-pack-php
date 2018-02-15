@@ -1234,4 +1234,35 @@ class PackTest extends TestCase
         $format = Pack::getOptimalFormat(-12.8, 12.7, 'char',1);
         $this->assertSame('t1char', $format);
     }
+
+    /**
+     * Correct # pack
+     */
+    public function testHashCharacterPack()
+    {
+        $data = array(
+            'foo' => 'peow peow!!!',
+        );
+        $lenRaw = strlen($data['foo']);
+        $binary = Pack::pack('#foo', $data);
+        $lenBin = strlen($binary);
+        $this->assertSame($lenRaw+1, $lenBin);
+    }
+
+    /**
+     * Correct # unpack
+     */
+    public function testHashCharacterUnpack()
+    {
+        $data = array(
+            'foo' => 'peow peow!!!',
+            'bar' => 'it is a foo bar',
+        );
+        $format = '#foo/#bar';
+        $binary = Pack::pack($format, $data);
+        $unpack = Pack::unpack($format, $binary);
+        $this->assertSame($data['foo'], $unpack['foo']);
+        $this->assertSame($data['bar'], $unpack['bar']);
+
+    }
 }

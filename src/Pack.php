@@ -65,6 +65,9 @@ class Pack
                     if(empty($meta['number'])) $meta['number'] = 1;
                     $result = substr($result,0,$meta['number']);
                     break;
+                case '#':
+                    $result .= \pack('A*x1', $packValue);
+                    break;
                 case 'x':
                     $result .= \pack($meta['character'].$meta['number']);
                     break;
@@ -114,9 +117,10 @@ class Pack
     /**
      * @param string $format
      * @param string $string
+     * @param bool $trim
      * @return array
      */
-    public static function unpack($format, $string)
+    public static function unpack($format, $string, $trim=true)
     {
         $result = array();
         $pack = self::parseFormat($format);
@@ -125,6 +129,13 @@ class Pack
             if (!$len) {
                 if ($meta['number'] == '*') {
                     $len = strlen($string);
+                } elseif ($meta['character'] == '#') {
+                    $len = strpos($string, "\0");
+                    if ($len === false) {
+                        $len = strlen($string);
+                    } else {
+                        $len++;
+                    }
                 } else {
                     $len = $meta['number'];
                 }
@@ -136,9 +147,10 @@ class Pack
                 case 'x': // no break
                 case 'X':
                     break;
+                case '#': // no break
                 case 'a': // no break
                 case 'A':
-                $result[$key] = $bin;
+                    $result[$key] = $bin;
                     break;
                 case 't':
                     $array = \unpack('ckey', $bin);
@@ -192,6 +204,9 @@ class Pack
             if (!empty($meta['added']) && isset($result[$key])) {
                 $result[$key] += $meta['added'];
             }
+            if ($trim && is_string($result[$key])) {
+                $result[$key] = trim($result[$key]);
+            }
         }
         return $result;
     }
@@ -219,14 +234,14 @@ class Pack
         if (is_int($difference)) {
             $character = $precision?'B':'L';
             $added = $maximal - $difference;
-            if ($checkedAdded < (1 << 31)) {
+            if ($checkedAdded && $checkedAdded < (1 << 31)) {
                 $character = $precision?'b':'l';
                 $added = $maximal - $difference + (1 << 31);
             }
             if ($maximal < (1 << 24)) {
                 $character = $precision?'R':'M';
                 $added = $maximal - $difference;
-                if ($checkedAdded < (1 << 23)) {
+                if ($checkedAdded && $checkedAdded < (1 << 23)) {
                     $character = $precision?'r':'m';
                     $added = $maximal - $difference + (1 << 23);
                 }
@@ -234,7 +249,7 @@ class Pack
             if ($maximal < (1 << 16)) {
                 $character = $precision?'O':'S';
                 $added = $maximal - $difference;
-                if ($checkedAdded < (1 << 15)) {
+                if ($checkedAdded && $checkedAdded < (1 << 15)) {
                     $character = $precision?'o':'s';
                     $added = $maximal - $difference + (1 << 15);
                 }
@@ -242,7 +257,7 @@ class Pack
             if ($maximal < (1 << 8)) {
                 $character = $precision?'T':'C';
                 $added = $maximal - $difference;
-                if ($checkedAdded < (1 << 7)) {
+                if ($checkedAdded && $checkedAdded < (1 << 7)) {
                     $character = $precision?'t':'c';
                     $added = $maximal - $difference + (1 << 7);
                 }
@@ -261,7 +276,7 @@ class Pack
     {
         $result = array();
         $regexp = '/^'
-            .'(?<character>[ahcsnvilqfgdexmtorbAHCSNVILQJPGEXZMTORB\@])'
+            .'(?<character>[ahcsnvilqfgdexmtorbAHCSNVILQJPGEXZMTORB\@\#])'
             .'(?<number>(\d+|\*))?'
             .'(?<key>[^\d:][^:]*)'
             .'(:(?<added>(\-)?(\d+(\.\d+)?|\.\d+)))?'
@@ -289,12 +304,12 @@ class Pack
                     );
                 }
             } else {
-                if (strpos('bortx@BORTZX', $match['character']) !== false && $match['number'] == '*') {
+                if (strpos('bortx@BORTZX#', $match['character']) !== false && $match['number'] == '*') {
                     throw new \InvalidArgumentException(
                         'incorrect number * for character '.$match['character']
                         .' ('.$item.')'
                     );
-                } elseif (strpos('boratx@BORATZX', $match['character']) === false) {
+                } elseif (strpos('boratx@BORATZX#', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'number must be empty for character '.$match['character']
                         .' ('.$item.')'
@@ -308,7 +323,7 @@ class Pack
             if (empty($match['added'])) {
                 $match['added'] = 0;
             } else {
-                if (strpos('cslnvqfgdtrombCSLNVQJPGETROMB', $match['character']) === false) {
+                if (strpos('cslnvqfgdtrombCSLNVQJPGETROMB#', $match['character']) === false) {
                     throw new \InvalidArgumentException(
                         'added must be empty for character '.$match['character']
                         .' ('.$item.')'
