@@ -1,7 +1,7 @@
 {
   "name": "ddrv/extra-pack",
-  "version": "0.9.3-beta",
-  "time": "2018-02-01 14:21:58",
+  "version": "0.9.4-beta",
+  "time": "2018-02-15 8:27:32",
   "type": "library",
   "description": "Extras for pack() and unpack() functions",
   "keywords": ["pack", "unpack", "binary", "binary-string", "binary-data", "extras"],
