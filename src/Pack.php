@@ -118,12 +118,13 @@ class Pack
      * @param string $format
      * @param string $string
      * @param bool $trim
+     * @param bool $trusted
      * @return array
      */
-    public static function unpack($format, $string, $trim=true)
+    public static function unpack($format, $string, $trim=true, $trusted=false)
     {
         $result = array();
-        $pack = self::parseFormat($format);
+        $pack = self::parseFormat($format, $trusted);
         foreach ($pack as $key=>$meta) {
             $len = self::getSize($meta['character']);
             if (!$len) {
@@ -234,45 +235,49 @@ class Pack
         if (is_int($difference)) {
             $character = $precision?'B':'L';
             $added = $maximal - $difference;
-            if ($checkedAdded && $checkedAdded < (1 << 31)) {
+            if ($checkedAdded && $checkedAdded < pow(2, 31)) {
                 $character = $precision?'b':'l';
-                $added = $maximal - $difference + (1 << 31);
+                $added = $maximal - $difference;
             }
-            if ($maximal < (1 << 24)) {
+            if ($difference < pow(2, 24)) {
                 $character = $precision?'R':'M';
                 $added = $maximal - $difference;
-                if ($checkedAdded && $checkedAdded < (1 << 23)) {
+                if ($checkedAdded && $checkedAdded < pow(2, 23)) {
                     $character = $precision?'r':'m';
-                    $added = $maximal - $difference + (1 << 23);
+                    $added = $maximal - $difference;
                 }
             }
-            if ($maximal < (1 << 16)) {
+            if ($difference < pow(2, 16)) {
                 $character = $precision?'O':'S';
                 $added = $maximal - $difference;
-                if ($checkedAdded && $checkedAdded < (1 << 15)) {
+                if ($checkedAdded && $checkedAdded < pow(1, 15)) {
                     $character = $precision?'o':'s';
-                    $added = $maximal - $difference + (1 << 15);
+                    $added = $maximal - $difference;
                 }
             }
-            if ($maximal < (1 << 8)) {
+            if ($difference < pow(1, 8)) {
                 $character = $precision?'T':'C';
                 $added = $maximal - $difference;
-                if ($checkedAdded && $checkedAdded < (1 << 7)) {
+                if ($checkedAdded && $checkedAdded < pow(1, 7)) {
                     $character = $precision?'t':'c';
-                    $added = $maximal - $difference + (1 << 7);
+                    $added = $maximal - $difference;
                 }
             }
         }
         $number = $precision?$precision:'';
+        if ($added) {
+            $added = ($added/pow(10, $precision));
+        }
         return $character.$number.$key.($added?':'.$added:'');
     }
 
     /**
      * @param string $format
+     * @param bool $trusted
      * @return array
      * @throws \InvalidArgumentException
      */
-    protected static function parseFormat($format)
+    protected static function parseFormat($format, $trusted=false)
     {
         $result = array();
         $regexp = '/^'
@@ -284,61 +289,62 @@ class Pack
         $array = explode('/', $format);
         foreach ($array as $item) {
             preg_match($regexp, $item, $match);
+            if (!$trusted) {
 
-            /*
-             * Check correct format part
-             */
-            if (!isset($match['character']) || !isset($match['key'])) {
-                throw new \InvalidArgumentException('incorrect format ('.$item.')');
-            }
-
-            /*
-             * Check correct character for number
-             */
-            if (empty($match['number'])) {
-                $match['number'] = '';
-                if (strpos('abort@ZABORT', $match['character']) !== false) {
-                    throw new \InvalidArgumentException(
-                        'number can not be empty for character '.$match['character']
-                        .' ('.$item.')'
-                    );
+                /*
+                 * Check correct format part
+                 */
+                if (!isset($match['character']) || !isset($match['key'])) {
+                    throw new \InvalidArgumentException('incorrect format (' . $item . ')');
                 }
-            } else {
-                if (strpos('bortx@BORTZX~', $match['character']) !== false && $match['number'] == '*') {
-                    throw new \InvalidArgumentException(
-                        'incorrect number * for character '.$match['character']
-                        .' ('.$item.')'
-                    );
-                } elseif (strpos('boratx@BORATZX~', $match['character']) === false) {
-                    throw new \InvalidArgumentException(
-                        'number must be empty for character '.$match['character']
-                        .' ('.$item.')'
-                    );
+
+                /*
+                 * Check correct character for number
+                 */
+                if (empty($match['number'])) {
+                    $match['number'] = '';
+                    if (strpos('abort@ZABORT', $match['character']) !== false) {
+                        throw new \InvalidArgumentException(
+                            'number can not be empty for character ' . $match['character']
+                            . ' (' . $item . ')'
+                        );
+                    }
+                } else {
+                    if (strpos('bortx@BORTZX~', $match['character']) !== false && $match['number'] == '*') {
+                        throw new \InvalidArgumentException(
+                            'incorrect number * for character ' . $match['character']
+                            . ' (' . $item . ')'
+                        );
+                    } elseif (strpos('boratx@BORATZX~', $match['character']) === false) {
+                        throw new \InvalidArgumentException(
+                            'number must be empty for character ' . $match['character']
+                            . ' (' . $item . ')'
+                        );
+                    }
+                }
+
+                /*
+                 * Check correct character for number
+                 */
+                if (empty($match['added'])) {
+                    $match['added'] = 0;
+                } else {
+                    if (strpos('cslnvqfgdtrombCSLNVQJPGETROMB~', $match['character']) === false) {
+                        throw new \InvalidArgumentException(
+                            'added must be empty for character ' . $match['character']
+                            . ' (' . $item . ')'
+                        );
+                    } elseif (
+                        strpos('cslnvqgmCSLNVQJPGEM', $match['character']) !== false
+                        && ((int)$match['added'] != (float)$match['added'])
+                    ) {
+                        throw new \InvalidArgumentException(
+                            'added must be integer for character ' . $match['character']
+                            . ' (' . $item . ')'
+                        );
+                    }
                 }
             }
-
-            /*
-             * Check correct character for number
-             */
-            if (empty($match['added'])) {
-                $match['added'] = 0;
-            } else {
-                if (strpos('cslnvqfgdtrombCSLNVQJPGETROMB~', $match['character']) === false) {
-                    throw new \InvalidArgumentException(
-                        'added must be empty for character '.$match['character']
-                        .' ('.$item.')'
-                    );
-                } elseif (
-                    strpos('cslnvqgtrombCSLNVQJPGETROMB', $match['character']) !== false
-                    && ((int)$match['added'] != (float)$match['added'])
-                ) {
-                    throw new \InvalidArgumentException(
-                        'added must be integer for character '.$match['character']
-                        .' ('.$item.')'
-                    );
-                }
-            }
-
             /*
              * return result
              */
